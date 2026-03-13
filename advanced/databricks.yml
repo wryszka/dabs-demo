@@ -1,5 +1,9 @@
 # Insurance Claims Risk Scoring Pipeline — Databricks Asset Bundle
 # Production-grade configuration with dev/prod targets and Unity Catalog integration
+#
+# SETUP: Before running, set your workspace host below.
+#        Optionally set a profile if you have multiple in ~/.databrickscfg.
+#        Update catalog/schema variables to match your Unity Catalog.
 
 bundle:
   name: insurance_claims_risk_scoring
@@ -23,10 +27,10 @@ targets:
     mode: development
     default: true
     workspace:
-      host: https://fevm-lr-serverless-aws-us.cloud.databricks.com
-      profile: DEFAULT
+      host: https://REPLACE-ME.cloud.databricks.com    # <-- REPLACE with your workspace URL
+      # profile: DEFAULT          # <-- Uncomment and set if you have multiple CLI profiles
     variables:
-      catalog: dev_insurance_catalog
+      catalog: dev_insurance_catalog       # <-- Change to your dev catalog
       schema: claims
       landing_zone_path: /Volumes/dev_insurance_catalog/claims/landing
 
@@ -36,13 +40,13 @@ targets:
   prod:
     mode: production
     workspace:
-      host: https://fevm-lr-serverless-aws-us.cloud.databricks.com
-      profile: DEFAULT
-      root_path: /Workspace/Users/laurence.ryszka@databricks.com/.bundle/${bundle.name}/${bundle.target}
+      host: https://REPLACE-ME.cloud.databricks.com    # <-- REPLACE with your workspace URL
+      # profile: DEFAULT          # <-- Uncomment and set if you have multiple CLI profiles
+      root_path: /Workspace/Users/${workspace.current_user.userName}/.bundle/${bundle.name}/${bundle.target}
     variables:
-      catalog: prod_insurance_catalog
+      catalog: prod_insurance_catalog      # <-- Change to your prod catalog
       schema: claims
       landing_zone_path: /Volumes/prod_insurance_catalog/claims/landing
     permissions:
-      - user_name: laurence.ryszka@databricks.com
+      - user_name: ${workspace.current_user.userName}
         level: CAN_MANAGE

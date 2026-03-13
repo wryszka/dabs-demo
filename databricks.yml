@@ -1,5 +1,8 @@
 # Databricks Asset Bundle definition for dabs_demo
 # Docs: https://docs.databricks.com/dev-tools/bundles/index.html
+#
+# SETUP: Before running, set your workspace host below.
+#        Optionally set a profile if you have multiple in ~/.databrickscfg.
 
 bundle:
   name: dabs_demo
@@ -8,11 +11,9 @@ include:
   - resources/*.yml
 
 targets:
-  # Development target — resources are prefixed with '[dev <username>]'
-  # and schedules are paused automatically.
   dev:
     mode: development
     default: true
     workspace:
-      host: https://fevm-lr-serverless-aws-us.cloud.databricks.com
-      profile: DEFAULT
+      host: https://REPLACE-ME.cloud.databricks.com    # <-- REPLACE with your workspace URL
+      # profile: DEFAULT          # <-- Uncomment and set if you have multiple CLI profiles

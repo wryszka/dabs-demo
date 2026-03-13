@@ -1,0 +1,18 @@
+# Databricks Asset Bundle definition for dabs_demo
+# Docs: https://docs.databricks.com/dev-tools/bundles/index.html
+
+bundle:
+  name: dabs_demo
+
+include:
+  - resources/*.yml
+
+targets:
+  # Development target — resources are prefixed with '[dev <username>]'
+  # and schedules are paused automatically.
+  dev:
+    mode: development
+    default: true
+    workspace:
+      host: https://fevm-lr-serverless-aws-us.cloud.databricks.com
+      profile: DEFAULT

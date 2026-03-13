@@ -7,6 +7,17 @@ A minimal live demo showing the full DABs lifecycle: init, validate, deploy, run
 - [Databricks CLI](https://docs.databricks.com/dev-tools/cli/install.html) v0.200+ installed and authenticated
 - Python 3.10+
 
+## Getting Started
+
+```bash
+git clone https://github.com/wryszka/dabs-demo.git
+cd dabs-demo
+```
+
+Before running, update `databricks.yml` if needed:
+- Set `workspace.host` to your Databricks workspace URL
+- Set `workspace.profile` to match your Databricks CLI profile name (run `databricks auth profiles` to list available profiles)
+
 ## Project Structure
 
 ```
@@ -26,6 +37,7 @@ dabs-demo/
 | `bundle.name` | Unique identifier for the bundle (`dabs_demo`) |
 | `targets.dev.mode` | `development` — prefixes resources with `[dev <user>]`, pauses schedules |
 | `targets.dev.workspace.host` | The Databricks workspace URL to deploy to |
+| `targets.dev.workspace.profile` | The Databricks CLI auth profile to use (from `~/.databrickscfg`) |
 
 ---
 

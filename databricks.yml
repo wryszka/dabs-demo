@@ -15,5 +15,5 @@ targets:
     mode: development
     default: true
     workspace:
-      host: https://REPLACE-ME.cloud.databricks.com    # <-- REPLACE with your workspace URL
-      # profile: DEFAULT          # <-- Uncomment and set if you have multiple CLI profiles
+      host: https://fevm-lr-classic-aws-us.cloud.databricks.com/    # <-- REPLACE with your workspace URL
+      profile: DEFAULT          # <-- Uncomment and set if you have multiple CLI profiles

@@ -121,7 +121,7 @@ advanced/
 | Feature | How It's Implemented |
 |---------|---------------------|
 | **Two targets** | `dev` (single-node, development mode) / `prod` (autoscaling, production mode) |
-| **Environment overrides** | Dev: `Standard_DS3_v2`, 0 workers. Prod: `Standard_DS4_v2`, 2–10 autoscaling |
+| **Environment overrides** | Both targets use serverless compute (no cluster config needed) |
 | **Unity Catalog variables** | `${var.catalog}` and `${var.schema}` resolve per target |
 | **Task dependencies** | `score_risk` depends on `ingest_claims` — enforced DAG |
 | **Permissions** | `claims_auditors` group gets `CAN_VIEW` on the job |
@@ -238,7 +238,7 @@ databricks bundle deploy -t prod
 1. Go to **Workflows > Jobs**
 2. Look for **`insurance_claims_risk_scoring`** (no `[dev]` prefix in prod)
 3. Click it — the DAG is the same, but:
-   - **Clusters** tab: shows `Standard_DS4_v2` with autoscale 2–10 workers
+   - **Clusters** tab: shows serverless compute
    - **Schedule**: Daily at 6 AM UTC — **active** (not paused)
    - **Permissions**: `claims_auditors` group has `CAN_VIEW`
 

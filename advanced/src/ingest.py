@@ -52,6 +52,10 @@ def main():
     print(f"[INGEST] Catalog: {args.catalog}, Schema: {args.schema}")
     print(f"[INGEST] Landing zone: {args.landing_zone}")
 
+    # Ensure schema exists (catalog must already exist)
+    print(f"[INGEST] Creating schema if it doesn't exist...")
+    spark.sql(f"CREATE SCHEMA IF NOT EXISTS {args.catalog}.{args.schema}")
+
     # In production this would read from the landing zone:
     #   df = spark.read.format("json").load(args.landing_zone)
     # For demo purposes we generate mock data:

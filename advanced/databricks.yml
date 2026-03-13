@@ -1,0 +1,48 @@
+# Insurance Claims Risk Scoring Pipeline — Databricks Asset Bundle
+# Production-grade configuration with dev/prod targets and Unity Catalog integration
+
+bundle:
+  name: insurance_claims_risk_scoring
+
+include:
+  - resources/*.yml
+
+variables:
+  catalog:
+    description: Unity Catalog catalog for this environment
+  schema:
+    description: Unity Catalog schema for claims data
+  landing_zone_path:
+    description: Path to the raw claims data landing zone
+
+targets:
+  # ---------------------------------------------------------------------------
+  # DEV — single-node cluster, development mode (resource prefix + paused schedules)
+  # ---------------------------------------------------------------------------
+  dev:
+    mode: development
+    default: true
+    workspace:
+      host: https://fevm-lr-serverless-aws-us.cloud.databricks.com
+      profile: DEFAULT
+    variables:
+      catalog: dev_insurance_catalog
+      schema: claims
+      landing_zone_path: /Volumes/dev_insurance_catalog/claims/landing
+
+  # ---------------------------------------------------------------------------
+  # PROD — autoscaling cluster, production mode (strict identity, no prefix)
+  # ---------------------------------------------------------------------------
+  prod:
+    mode: production
+    workspace:
+      host: https://fevm-lr-serverless-aws-us.cloud.databricks.com
+      profile: DEFAULT
+      root_path: /Workspace/Users/laurence.ryszka@databricks.com/.bundle/${bundle.name}/${bundle.target}
+    variables:
+      catalog: prod_insurance_catalog
+      schema: claims
+      landing_zone_path: /Volumes/prod_insurance_catalog/claims/landing
+    permissions:
+      - user_name: laurence.ryszka@databricks.com
+        level: CAN_MANAGE

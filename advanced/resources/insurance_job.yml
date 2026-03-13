@@ -1,0 +1,121 @@
+# Insurance Claims Risk Scoring — Multi-Task Workflow
+# Task chain: ingest_claims -> score_risk
+
+resources:
+  jobs:
+    insurance_claims_job:
+      name: insurance_claims_risk_scoring
+
+      # --- Schedule: daily at 6 AM UTC ---
+      schedule:
+        quartz_cron_expression: "0 0 6 * * ?"
+        timezone_id: UTC
+
+      # --- Permissions: claims_auditors group can view job runs ---
+      permissions:
+        - group_name: claims_auditors
+          level: CAN_VIEW
+
+      # --- Job-level parameters ---
+      parameters:
+        - name: catalog
+          default: ${var.catalog}
+        - name: schema
+          default: ${var.schema}
+        - name: landing_zone_path
+          default: ${var.landing_zone_path}
+
+      # --- Task definitions ---
+      tasks:
+        # Task 1: Ingest raw claims data from landing zone into Unity Catalog
+        - task_key: ingest_claims
+          spark_python_task:
+            python_file: ../src/ingest.py
+            parameters:
+              - "--catalog"
+              - ${var.catalog}
+              - "--schema"
+              - ${var.schema}
+              - "--landing-zone"
+              - ${var.landing_zone_path}
+          new_cluster:
+            spark_version: 15.4.x-scala2.12
+            node_type_id: Standard_DS3_v2
+            num_workers: 0
+            spark_conf:
+              spark.master: "local[*]"
+              spark.databricks.cluster.profile: singleNode
+            custom_tags:
+              ResourceClass: SingleNode
+
+        # Task 2: Run ML risk scoring model against ingested claims
+        - task_key: score_risk
+          depends_on:
+            - task_key: ingest_claims
+          spark_python_task:
+            python_file: ../src/scoring.py
+            parameters:
+              - "--catalog"
+              - ${var.catalog}
+              - "--schema"
+              - ${var.schema}
+          new_cluster:
+            spark_version: 15.4.x-scala2.12
+            node_type_id: Standard_DS3_v2
+            num_workers: 0
+            spark_conf:
+              spark.master: "local[*]"
+              spark.databricks.cluster.profile: singleNode
+            custom_tags:
+              ResourceClass: SingleNode
+
+      queue:
+        enabled: true
+
+# Target-specific cluster overrides
+targets:
+  dev:
+    resources:
+      jobs:
+        insurance_claims_job:
+          tasks:
+            - task_key: ingest_claims
+              new_cluster:
+                spark_version: 15.4.x-scala2.12
+                node_type_id: Standard_DS3_v2
+                num_workers: 0
+                spark_conf:
+                  spark.master: "local[*]"
+                  spark.databricks.cluster.profile: singleNode
+                custom_tags:
+                  ResourceClass: SingleNode
+            - task_key: score_risk
+              new_cluster:
+                spark_version: 15.4.x-scala2.12
+                node_type_id: Standard_DS3_v2
+                num_workers: 0
+                spark_conf:
+                  spark.master: "local[*]"
+                  spark.databricks.cluster.profile: singleNode
+                custom_tags:
+                  ResourceClass: SingleNode
+
+  prod:
+    resources:
+      jobs:
+        insurance_claims_job:
+          tasks:
+            - task_key: ingest_claims
+              new_cluster:
+                spark_version: 15.4.x-scala2.12
+                node_type_id: Standard_DS4_v2
+                autoscale:
+                  min_workers: 2
+                  max_workers: 10
+            - task_key: score_risk
+              new_cluster:
+                spark_version: 15.4.x-scala2.12
+                node_type_id: Standard_DS4_v2
+                autoscale:
+                  min_workers: 2
+                  max_workers: 10
